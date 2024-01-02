@@ -1,0 +1,20 @@
+version: '3.9'
+
+services:
+  dht:
+    image: ghcr.io/0-5788719150923125/dht:latest
+    entrypoint: ['sh', 'entrypoint.sh']
+    # restart: 'always'
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      dockerfile: Dockerfile
+      shm_size: '1gb'
+    # volumes:
+    #   - ./entrypoint.sh:/i/entrypoint.sh
+    #   - ./earn-e:/src
+    #   - ./data:/data
+    # ports:
+    #   - 4002:4002/tcp
+    #   - 4002:4002/udp
