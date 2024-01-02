@@ -2,7 +2,7 @@
   "name": "earn-e",
   "version": "0.1.0",
   "description": "trade stocks with an algorithm that benefits two@everyone",
-  "main": "/i/index.js",
+  "main": "earn-e/index.js",
   "type": "commonjs",
   "scripts": {
     "test": "echo \"TEST: Hello, world! \" && exit 1"
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/off-pipe/earn-e#readme",
   "dependencies": {
-    "@alpacahq/alpaca-trade-api": "^3.0.1"
+    "@alpacahq/alpaca-trade-api": "^3.0.1",
+    "gunsafe": "^2.6.0"
   }
 }

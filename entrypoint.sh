@@ -8,7 +8,7 @@
 #     --host_maddrs \
 #     "/ip4/0.0.0.0/tcp/4002,/ip4/0.0.0.0/udp/4002"
 
-# pip install --break-system-packages alpaca-py
+pip install --break-system-packages alpaca-py
 
 npm install
 

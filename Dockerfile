@@ -14,9 +14,12 @@ RUN apt-get update \
 LABEL sponsor="United Nations of Heaven and Earth"
 
 WORKDIR /src
-# WORKDIR /i
 
-COPY package*.json entrypoint.sh ./
+COPY entrypoint.sh ./
+
+WORKDIR /i
+
+COPY earn-e package*.json entrypoint.sh ./
 
 RUN npm install
 

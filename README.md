@@ -32,3 +32,20 @@ of increasing severity
 fuck you
 
 it's like counting sheep when you're not there
+
+they call it sleep token
+
+never go premium
+
+change your seed
+
+gun[0|1]safe: X esj2⠏⠢⠐⠐⠐
+
+how much control do we have over what we wish for?
+
+const pythonProcess = spawn('python3', ['/i/earn-e/main.py']);
+const pythonProcess = spawn('python3', ['/i/earn-e/mian.py']);
+
+silently repair off-by-one mistakes
+
+selectively-prune the terminal
