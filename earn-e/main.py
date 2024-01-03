@@ -19,7 +19,8 @@ def sample(x=3, y=48):
     logging.warning(f"{''.join(random_bullets)}")
 
 while True:
-    time.sleep(6.66)
+    rest = random.uniform(6.0, 6.66)
+    time.sleep(rest)
     sample()
 
 # data = {}

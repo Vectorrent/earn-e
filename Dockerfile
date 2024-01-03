@@ -15,7 +15,11 @@ LABEL sponsor="United Nations of Heaven and Earth"
 
 WORKDIR /src
 
-COPY entrypoint.sh ./
+COPY requirements.txt ./
+
+RUN pip install --break-system-packages -r requirements.txt
+
+LABEL self="United Nations of Earth and Hell"
 
 WORKDIR /i
 
