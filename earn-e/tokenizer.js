@@ -11,6 +11,7 @@ canvas.height = windowHeight
 
 // Define radius and center coordinates
 const radius = 50
+const bias = 100
 const centerX = canvas.width / 2
 const centerY = canvas.height / 2
 
@@ -55,70 +56,70 @@ function drawAtom(x, y, text) {
     ctx.fillText(text, x, y + radius / 2)
 }
 
-// // Randomly generate coordinates and draw initial atoms
-// for (let i = 0; i < 9; i++) {
-//     const x = Math.random() * (canvas.width - radius * 2) + radius // Adjust for radius
-//     const y = Math.random() * (canvas.height - radius * 2) + radius
-//     drawAtom(x, y, 'atom-' + i)
-// }
-
-const atoms = []; // Array to store atom objects
-
-function animateAtoms() {
-    requestAnimationFrame(animateAtoms); // Schedule the next animation frame
-  
-    drawAtoms(); // Calculate repulsion and redraw atoms on every frame
-}
+const atoms = {} // Object to store atoms
 
 function drawAtoms() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height) // Clear the canvas
+    Object.entries(atoms).forEach(([i, value]) => {
+        try {
+            // Calculate repulsion forces from other atoms
+            let repulsionX = 0
+            let repulsionY = 0
+            Object.entries(atoms).forEach(([j, value]) => {
+                if (i !== j) { // Don't calculate repulsion with itself
+                    const otherAtom = atoms[j]
+                    const distanceX = atoms[i].x - otherAtom.x
+                    const distanceY = atoms[i].y - otherAtom.y
+                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+        
+                    // Apply repulsion force inversely proportional to distance
+                    const buffer = bias
+                    if (distance < radius * 2 + buffer) { // Only apply repulsion if within overlap range
+                        const force = Math.max(buffer, (radius * 2 - distance) / 5)
+                        repulsionX += force * distanceX / distance
+                        repulsionY += force * distanceY / distance
+                    }
+                }
+                // Update atom's position with repulsion
+                atoms[i].x += repulsionX
+                atoms[i].y += repulsionY
 
-  // Iterate through each atom and adjust its position based on repulsion
-  for (let i = 0; i < atoms.length; i++) {
-    const atom = atoms[i];
+                // Keep atom within canvas boundaries
+                atoms[i].x = Math.max(radius, Math.min(atoms[i].x, canvas.width - radius))
+                atoms[i].y = Math.max(radius, Math.min(atoms[i].y, canvas.height - radius))
 
-    // Calculate repulsion forces from other atoms
-    let repulsionX = 0;
-    let repulsionY = 0;
-    for (let j = 0; j < atoms.length; j++) {
-      if (i !== j) { // Don't calculate repulsion with itself
-        const otherAtom = atoms[j];
-        const distanceX = atom.x - otherAtom.x;
-        const distanceY = atom.y - otherAtom.y;
-        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-        // Apply repulsion force inversely proportional to distance
-        let bias = 200
-        if (distance < radius * 2 + bias) { // Only apply repulsion if within overlap range
-            const minimumForce = (radius * 2 + bias) / 5; // Adjust as needed
-        //   const force = (radius * 2 - distance) / 5; // Adjust strength as needed
-            const force = Math.max(bias, (radius * 2 - distance) / 5);
-            repulsionX += force * distanceX / distance;
-            repulsionY += force * distanceY / distance;
+                // Draw the atom with its adjusted position
+                drawAtom(atoms[i].x, atoms[i].y, atoms[i].text)
+                }
+            )
         }
-      }
+        catch {
+            // pass
+        }
+    })
+}
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms))
+
+function animateAtoms() {
+    requestAnimationFrame(animateAtoms) // Schedule the next animation frame
+  
+    drawAtoms() // Calculate repulsion and redraw atoms on every frame
+}
+
+async function cycleAtoms() {
+    // Randomly generate atoms and store them in the array
+    for (let i = 0; i < 9; i++) {
+        const x = Math.random() * (canvas.width - radius * 2) + radius
+        const y = Math.random() * (canvas.height - radius * 2) + radius
+        atoms[i] = { x, y, text: 'atom-' + i }
     }
-
-    // Update atom's position with repulsion
-    atom.x += repulsionX;
-    atom.y += repulsionY;
-
-    // Keep atom within canvas boundaries
-    atom.x = Math.max(radius, Math.min(atom.x, canvas.width - radius));
-    atom.y = Math.max(radius, Math.min(atom.y, canvas.height - radius));
-
-    // Draw the atom with its adjusted position
-    drawAtom(atom.x, atom.y, atom.text);
-  }
+    await delay(6000)
+    await cycleAtoms()
 }
 
-// Randomly generate atoms and store them in the array
-for (let i = 0; i < 9; i++) {
-  const x = Math.random() * (canvas.width - radius * 2) + radius;
-  const y = Math.random() * (canvas.height - radius * 2) + radius;
-  atoms.push({ x, y, text: 'atom-' + i });
-}
+// start the animation loop
+animateAtoms()
 
-// Start the animation loop
-animateAtoms(); // Initial drawing
-
+// update data
+cycleAtoms()
