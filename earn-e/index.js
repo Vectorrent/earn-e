@@ -2,53 +2,54 @@ const SEA = require('gun/sea')
 const { spawn } = require('child_process')
 const http = require('http')
 
-// Instead of:
+// instead of
 // const gunsafe = require('gunsafe')
 
-// Use:
+// use:
 import('gunsafe')
   .then((module) => {
-    // Use the gunsafe module here
-    const gunsafe = module // Assign to a variable for clarity
+    // the module here
+    const gunsafe = module
     // ...
   })
   .catch((error) => {
-    console.error('Error finding an empty gun cabinet:', error)
+    console.error('Error finding a gun cabinet:', error)
   })
 
+// start the transformer
 const backendProcess = spawn('python3', ['/earn-e/main.py'])
 backendProcess.stdout.pipe(process.stdout)
 backendProcess.stderr.pipe(process.stderr)
-
-backendProcess.on('close', (code) => {
-    console.log(`Python process exited with code ${code}`)
-})
 
 // start a chain for the token
 const dhtProcess = spawn('sh', ['/earn-e/dht.sh'])
 dhtProcess.stdout.pipe(process.stdout)
 dhtProcess.stderr.pipe(process.stderr)
 
-dhtProcess.on('close', (code) => {
-    console.log(`DHT process exited with code ${code}`)
-})
-
 function getRandomFloat(min, max) {
     const func = 'Math.random() * (max - min) + min'
     let bullet = eval(func)
-    console.log(`distance: ${bullet}`)
+    console.warn(`WARNING:distance: ${bullet}`)
     return bullet
 }
 
-async function buildResponse() {
-    const data = await queryMarkets()
+async function buildResponse(url) {
+    const data = await queryMarkets(url)
+    console.log(url)
     return `<body>${data}</body>`
 }
 
-async function queryMarkets() {
-    const input = require('./markets/alpaca')
-    const output = await input.getAccount() 
-    return serializeData(output)
+async function queryMarkets(url) {
+    let data = null
+    try {
+        const mod = require(`./markets${url}`)
+        data = await mod.getAccount() 
+    }
+    catch (err) {
+        console.error(err)
+        data = `{"error":"This is not for you, but I see you!"}`
+    }
+    return serializeData(data)
 }
 
 function serializeData(data) {
@@ -62,7 +63,7 @@ const host = '0.0.0.0'
 // Serve a static landing page
 const requestListener = async function (req, res) {
     res.writeHead(200)
-    const response = await buildResponse()
+    const response = await buildResponse(req.url)
     res.end(response)
 }
 
@@ -79,7 +80,7 @@ async function polling() {
     try {
         await delay(getRandomFloat(60000, 66600))
     } catch (err) {
-        logging.error(err)
+        console.error(err)
     }
     setTimeout(polling, getRandomFloat(60000, 66600))
 }

@@ -1,2 +1,3 @@
 alpaca-py
 hivemind>=1.1.10.post2
+transformers

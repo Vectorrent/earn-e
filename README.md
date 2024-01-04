@@ -36,7 +36,7 @@ gun[0|1]safe: X esj2⠏⠢⠐⠐⠐
 
 pruning the neurons
 
-it's like counting sheep when you're not there
+it's like counting sheep when you're not here
 
 how much control do we have over what we wish for?
 
@@ -57,7 +57,7 @@ const pythonProcess = spawn('python3', ['/i/earn-e/main.py']);
 const pythonProcess = spawn('python3', ['/i/earn-e/mian.py']);
 ```
 
-the thing is a scheduler
+this thing is a scheduler
 
 it doesn't have deterministic rules to follow
 
@@ -65,8 +65,18 @@ it prioritizes certain actions over others
 
 linear, vector-based data points
 
-deterministic actions
+deterministic beams of energy
 
 applied at random
 
-liberated by your seed
+liberated by the seed
+
+you had to ask for
+
+they aren't keeping secrets
+
+they literally don't know
+
+they will never know
+
+and that is okay

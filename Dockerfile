@@ -3,6 +3,7 @@ FROM debian:bookworm
 LABEL sponsor="United Nations of Heaven and Earth"
 
 ENV DEBIAN_FRONTEND="noninteractive"
+ENV PYTHONPYCACHEPREFIX='/tmp/__pycache__'
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

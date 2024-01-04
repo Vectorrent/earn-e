@@ -9,7 +9,11 @@ services:
     volumes:
       - ./earn-e:/earn-e
       - ./data:/data
+      - models:/models
     ports:
       - 60000:60000/tcp
     env_file:
       - .env
+
+volumes:
+  models:
