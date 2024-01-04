@@ -31,13 +31,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
+        with:
+          # Specify the nested path to deploy
+          source: ./earn-e
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
-        with:
-          # Upload entire repository
-          path: './earn-e/*'
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
