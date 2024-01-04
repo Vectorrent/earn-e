@@ -64,8 +64,34 @@ const requestListener = async function (req, res) {
     console.log(`bearing is: ${req.url}`)
 
     res.writeHead(200)
+
+    // reserve a static.x
+    if (req.url.endsWith('/x')) {
+        res.writeHead(400)
+    } else if (req.url.endsWith('/favicon.ico')) {
+        res.writeHead(400)
+    } else if (req.url.endsWith('/tokenizer.js')) {
+        const filePath = '/earn-e/tokenizer.js'
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                    res.statusCode = 404
+                    res.end('File not found')
+                } else {
+                    fs.createReadStream(filePath).pipe(res)
+                }
+            })
+    } else if (req.url.endsWith('/styles.css')) {
+        const filePath = '/earn-e/styles.css'
+        fs.access(filePath, fs.constants.F_OK, (err) => {
+            if (err) {
+                    res.statusCode = 404
+                    res.end('File not found')
+                } else {
+                    fs.createReadStream(filePath).pipe(res)
+                }
+            })
     // serve a landing page
-    if (req.url === "/") {
+    } else if (req.url === "/") {
         const filePath = '/earn-e/index.html'
         fs.access(filePath, fs.constants.F_OK, (err) => {
             if (err) {
@@ -76,24 +102,6 @@ const requestListener = async function (req, res) {
                 }
             }
         )
-    }
-    // reserve a static.x
-    else if (req.url.endsWith('/x')) {
-        res.writeHead(400)
-    }
-    else if (req.url.endsWith('/favicon.ico')) {
-        res.writeHead(400)
-    }
-    else if (req.url.endsWith('/tokenizer.js')) {
-        const filePath = '/earn-e/tokenizer.js'
-        fs.access(filePath, fs.constants.F_OK, (err) => {
-            if (err) {
-                    res.statusCode = 404
-                    res.end('File not found')
-                } else {
-                    fs.createReadStream(filePath).pipe(res)
-                }
-            })
     } else {
         const data = await buildResponse(req.url)
         res.end(data)
