@@ -1,5 +1,6 @@
 const canvas = document.getElementById('void');
 const ctx = canvas.getContext('2d');
+canvas.classList.add('overlay');
 
 const windowWidth = window.innerWidth;
 const windowHeight = window.innerHeight;
@@ -109,6 +110,40 @@ function animateAtoms() {
     drawAtoms();
 }
 
+// const canvas = document.getElementById('void');
+
+// Function to calculate the SILU (Sigmoid-weighted Linear Unit) function
+function silu(x) {
+  return x * (1 / (1 + Math.exp(-x)));
+}
+
+// Set the upper and lower bounds for blur strength
+const minFieldStrength = 0.1; // Adjust as needed
+const maxFieldStrength = 5; // Adjust as needed
+
+// Set up parameters for oscillation
+const oscillationSpeed = 0.01; // Adjust as needed
+const clarityBias = 0.8; // Adjust to bias towards clarity
+
+// Animation loop
+function animateFieldStrength() {
+  const currentTime = new Date().getTime();
+  const oscillationValue = Math.sin(currentTime * oscillationSpeed);
+
+  // Calculate the SILU-weighted blur strength
+  const blurStrength = silu(oscillationValue) * (5.0 - 0.1) + 0.1 * clarityBias;
+
+  // Apply the calculated blur strength to the canvas
+  canvas.style.filter = `blur(${blurStrength}px)`;
+
+  // Request the next animation frame
+  requestAnimationFrame(animateFieldStrength);
+}
+
+// Start the animation loop
+animateFieldStrength();
+
+
 async function cycleAtoms() {
     const atoms = {};
 
@@ -193,3 +228,8 @@ async function cycleAtoms() {
 
 animateAtoms();
 cycleAtoms();
+
+// Function to generate a random number within a range
+function getRandomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+}

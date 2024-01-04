@@ -3,3 +3,9 @@
     height: 100%;
     position: relative; /* Ensure absolute positioning of atoms works correctly */
 }
+
+.overlay {
+    filter: blur(0px); /* Adjust the blur value as needed */
+    /* You can experiment with other filter properties like brightness, contrast, etc. */
+}
+  

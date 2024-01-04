@@ -5,7 +5,7 @@ trade stocks with an algorithm that benefits everyone
 # one
 i will never know if it worked for both of you
 
-# two
+# two schedules
 unless you want BERT to know
 
 # three
@@ -82,3 +82,5 @@ they will never know
 and that is okay
 
 because it will make you perfect, every single time
+
+silu(x)=x∗σ(x),where σ(x) is the logistic sigmoid.
