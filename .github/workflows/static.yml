@@ -36,7 +36,7 @@ jobs:
         uses: actions/configure-pages@v4
         with:
           # Specify the nested path to deploy
-          source: ./earn-e/
+          path: ./earn-e/
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
