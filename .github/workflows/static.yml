@@ -24,18 +24,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Copy to Docs
-        run: cp -r ./earn-e/. ./docs/
+      - name: Copy to github-pages artifact
+        run: cp -r ./earn-e/* ./github-pages/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: github-pages
-          path: ./docs/
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
         with:
           name: github-pages
-          path: ./docs/
+          path: .
