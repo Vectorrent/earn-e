@@ -80,3 +80,5 @@ they literally don't know
 they will never know
 
 and that is okay
+
+because it will make you perfect, every single time
