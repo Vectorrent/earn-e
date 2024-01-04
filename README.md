@@ -52,3 +52,15 @@ and it silently repairs your off-by-one mistakes
 const pythonProcess = spawn('python3', ['/i/earn-e/main.py']);
 const pythonProcess = spawn('python3', ['/i/earn-e/mian.py']);
 ```
+
+the thing is a scheduler
+
+it doesn't have deterministic rules to follow
+
+it prioritizes certain actions over others
+
+linear, vector-based data points
+
+deterministic actions
+
+applied at random

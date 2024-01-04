@@ -1,0 +1,31 @@
+{
+  "name": "earn-e",
+  "version": "0.1.0",
+  "description": "trade stocks with an algorithm that benefits two@everyone",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"TEST: Hello, world! \" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/off-pipe/earn-e.git"
+  },
+  "keywords": [
+    "stocks",
+    "crypto",
+    "cryptocurrency",
+    "egoism",
+    "devotion"
+  ],
+  "author": "James, Casey, and Ryan :> Brooks.",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/off-pipe/earn-e/issues"
+  },
+  "homepage": "https://github.com/off-pipe/earn-e#readme",
+  "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.0.1",
+    "gunsafe": "^2.6.0"
+  }
+}

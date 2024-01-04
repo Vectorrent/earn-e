@@ -1,5 +1,7 @@
 FROM debian:bookworm
 
+LABEL sponsor="United Nations of Heaven and Earth"
+
 ENV DEBIAN_FRONTEND="noninteractive"
 
 RUN apt-get update \
@@ -11,20 +13,20 @@ RUN apt-get update \
     python3-packaging \
     && rm -rf /var/lib/apt/lists/*
 
-LABEL sponsor="United Nations of Heaven and Earth"
-
 WORKDIR /src
 
-COPY requirements.txt ./
+COPY requirements.txt entrypoint.sh ./
 
 RUN pip install --break-system-packages -r requirements.txt
 
 LABEL self="United Nations of Earth and Hell"
 
-WORKDIR /i
+WORKDIR /earn-e
 
-COPY earn-e package*.json entrypoint.sh ./
+COPY earn-e package*.json ./
 
 RUN npm install
 
-ENTRYPOINT [ "sh", "entrypoint.sh" ]
+LABEL self='<NAME>'
+
+ENTRYPOINT [ "sh", "/src/entrypoint.sh" ]

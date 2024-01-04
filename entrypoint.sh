@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd /earn-e
+
 npm install
 
-node index.js
+node /earn-e/index.js

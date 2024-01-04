@@ -2,13 +2,31 @@
     "version": "2.0.0",
     "tasks": [
       {
-        "label": "bet",
-        "detail": "start the environment",
+        "label": "up",
+        "detail": "start trading",
         "type": "shell",
         "command": "docker compose up",
       },
       {
-        "label": "zod",
+        "label": "bet",
+        "detail": "build your hand",
+        "type": "shell",
+        "command": "docker compose build",
+      },
+      {
+        "label": "build",
+        "detail": "build your hand",
+        "type": "shell",
+        "command": "docker compose build",
+      },
+      {
+        "label": "fold",
+        "detail": "stop the ship",
+        "type": "shell",
+        "command": "docker compose down",
+      },
+      {
+        "label": "down",
         "detail": "stop the ship",
         "type": "shell",
         "command": "docker compose down",

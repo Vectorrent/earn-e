@@ -3,19 +3,13 @@ version: '3.9'
 services:
   dht:
     image: ghcr.io/0-5788719150923125/dht:latest
-    # restart: 'always'
     tty: true
     stdin_open: true
-    build:
-      context: .
-      dockerfile: Dockerfile
-      shm_size: '1gb'
+    build: .
     volumes:
-      - ./entrypoint.sh:/i/entrypoint.sh
-      - ./earn-e:/i/earn-e
+      - ./earn-e:/earn-e
       - ./data:/data
+    ports:
+      - 60000:60000/tcp
     env_file:
       - .env
-    # ports:
-    #   - 4002:4002/tcp
-    #   - 4002:4002/udp

@@ -3,9 +3,12 @@ import logging
 import random
 import json
 import alpaca
+import inspect
 
 # HEAD
 logging.error(help(alpaca))
+logging.error(dir(alpaca))
+logging.error(inspect.getmembers(alpaca))
 logging.warning("ALPACA: Ask for help menu.")
 
 with open('bullets.json', "r") as file:
