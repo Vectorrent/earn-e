@@ -8,39 +8,36 @@ const windowHeight = window.innerHeight;
 canvas.width = windowWidth;
 canvas.height = windowHeight;
 
-const baseRadius = 50; // Base radius of atoms
+const baseRadius = 44; // Base radius of atoms
+const scalingFactor = 0.1
 const bias = 100;
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 
-
 function drawAtom(x, y, z, text) {
-    const scaledRadius = baseRadius / (1 + z * 0.01);
+    const scaledRadius = baseRadius / (1 + z * scalingFactor);
 
     // Calculate color based on z value
-    const minColor = [0, 0, 255]; // Blue
-    const maxColor = [255, 0, 0]; // Red
+    const colorCycle = Math.sin(z * 0.1); // Sine wave for color oscillation
+    const blueChannel = Math.floor(255 * (0.5 - 0.5 * colorCycle));
+    const redChannel = Math.floor(255 * (0.5 + 0.5 * colorCycle));
 
-    const color = [
-        Math.floor(minColor[0] + (maxColor[0] - minColor[0]) * (1 - z)),
-        Math.floor(minColor[1] + (maxColor[1] - minColor[1]) * Math.abs(z)),
-        Math.floor(minColor[2] + (maxColor[2] - minColor[2]) * (1 + z)),
-    ];
+    // Draw the line to the center of the canvas (behind the atom)
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(centerX, centerY);
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
 
     // Draw the atom shape (filled circle) with scaled radius and calculated color
     ctx.beginPath();
     ctx.arc(x, y, scaledRadius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
+    ctx.fillStyle = `rgb(${redChannel}, 0, ${blueChannel})`;
     ctx.fill();
 
     // Draw the outline of the atom
     ctx.lineWidth = 2;
-    ctx.strokeStyle = 'blue';
-    ctx.stroke();
-
-    // Draw the line to the center of the canvas
-    ctx.moveTo(x, y);
-    ctx.lineTo(centerX, centerY);
+    ctx.strokeStyle = 'black';
     ctx.stroke();
 
     // Draw the text inside the atom
@@ -50,8 +47,6 @@ function drawAtom(x, y, z, text) {
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x, y + scaledRadius / 2);
 }
-
-
 
 function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
     const dx = (new_x - old_x) * damping;
