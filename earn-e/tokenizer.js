@@ -51,10 +51,11 @@ function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
 
 let heads = {}
 let tails = {}
+const damping = 0.01 // Adjust as needed for smoothness
+const tolerance = 1
 
 function drawAtoms() {
-    const damping = 0.01 // Adjust as needed for smoothness
-    const tolerance = 1
+
 
     ctx.clearRect(0, 0, canvas.width, canvas.height)
 
@@ -104,7 +105,7 @@ function animateAtoms() {
 }
 
 async function cycleAtoms() {
-    const atoms = {}
+    const atoms = {};
 
     // If heads is empty, initialize it with default values
     if (Object.keys(heads).length === 0) {
@@ -122,8 +123,8 @@ async function cycleAtoms() {
     } else {
         Object.entries(heads).forEach(([i, value]) => {
             // Generate new target positions nearby the current positions
-            const targetX = heads[i].x + Math.random() * 100 - 50 // Adjust the range as needed
-            const targetY = heads[i].y + Math.random() * 100 - 50 // Adjust the range as needed
+            const targetX = heads[i].x + Math.random() * 100 - 50; // Adjust the range as needed
+            const targetY = heads[i].y + Math.random() * 100 - 50; // Adjust the range as needed
 
             atoms[i] = {
                 x: heads[i].x,
@@ -131,16 +132,56 @@ async function cycleAtoms() {
                 text: 'atom-' + i,
                 targetX,
                 targetY,
-            }
-        })
+            };
+        });
     }
 
-    tails = { ...heads }
-    heads = atoms
+    tails = { ...heads };
+    heads = atoms;
 
-    await delay(6000)
-    await cycleAtoms()
+    repulsionStrength = 0.1; // Adjust this value to control repulsion strength
+
+    Object.entries(heads).forEach(([i, value]) => {
+        let repulsionX = 0;
+        let repulsionY = 0;
+
+        Object.entries(heads).forEach(([j, value]) => {
+            if (i !== j) {
+                const otherAtom = heads[j];
+                const distanceX = heads[i].x - otherAtom.x;
+                const distanceY = heads[i].y - otherAtom.y;
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                const buffer = bias;
+                if (distance < radius * 2 + buffer) {
+                    const force = Math.max(buffer, (radius * 2 - distance) / 5);
+                    const repulsionForce = force * repulsionStrength; // Adjust repulsion strength
+                    repulsionX += repulsionForce * distanceX / distance;
+                    repulsionY += repulsionForce * distanceY / distance;
+                }
+            }
+        });
+
+        const moveResult = moveAtomLinear(heads[i].x, heads[i].y, heads[i].targetX, heads[i].targetY, damping);
+        heads[i].x = moveResult.x + repulsionX;
+        heads[i].y = moveResult.y + repulsionY;
+
+        heads[i].x = Math.max(radius, Math.min(heads[i].x, canvas.width - radius));
+        heads[i].y = Math.max(radius, Math.min(heads[i].y, canvas.height - radius));
+
+        drawAtom(heads[i].x, heads[i].y, heads[i].text);
+
+        if (Math.abs(heads[i].x - heads[i].targetX) <= tolerance &&
+            Math.abs(heads[i].y - heads[i].targetY) <= tolerance) {
+            heads[i].targetX = Math.random() * (canvas.width - radius * 2) + radius;
+            heads[i].targetY = Math.random() * (canvas.height - radius * 2) + radius;
+        }
+    });
+
+    await delay(6000);
+    await cycleAtoms();
 }
+
 
 animateAtoms()
 cycleAtoms()
