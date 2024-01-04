@@ -1,41 +1,22 @@
 const canvas = document.getElementById('void')
 const ctx = canvas.getContext('2d')
 
-// Get window dimensions
 const windowWidth = window.innerWidth
 const windowHeight = window.innerHeight
 
-// Set canvas dimensions to match viewport
 canvas.width = windowWidth
 canvas.height = windowHeight
 
-// Define radius and center coordinates
 const radius = 50
 const bias = 100
 const centerX = canvas.width / 2
 const centerY = canvas.height / 2
 
 function drawAtom(x, y, text) {
-
-    // always print data to console
-    // console.log(x, y, text)
-
-    // Check if atom would be partially off-screen, considering radius
-    if (
-        x - radius < 0 ||
-        x + radius > canvas.width ||
-        y - radius < 0 ||
-        y + radius > canvas.height
-    ) {
-        // Generate new random coordinates within bounds
-        x = Math.random() * (canvas.width - radius * 2) + radius
-        y = Math.random() * (canvas.height - radius * 2) + radius
-    }
-
     // Draw the atom shape (filled circle)
     ctx.beginPath()
     ctx.arc(x, y, radius, 0, Math.PI * 2)
-    ctx.fillStyle = 'lightblue'
+    ctx.fillStyle = 'lightblue';
     ctx.fill()
 
     // Draw the outline of the atom
@@ -56,45 +37,61 @@ function drawAtom(x, y, text) {
     ctx.fillText(text, x, y + radius / 2)
 }
 
-const atoms = {} // Object to store atoms
+function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
+    // Calculate the distance to move in each direction
+    const dx = (new_x - old_x) * damping
+    const dy = (new_y - old_y) * damping
+
+    // Move the atom one step closer to its target
+    const updated_x = old_x + dx
+    const updated_y = old_y + dy
+
+    return { x: updated_x, y: updated_y }
+}
+
+let heads = {}
+let tails = {}
 
 function drawAtoms() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height) // Clear the canvas
-    Object.entries(atoms).forEach(([i, value]) => {
-        try {
-            // Calculate repulsion forces from other atoms
-            let repulsionX = 0
-            let repulsionY = 0
-            Object.entries(atoms).forEach(([j, value]) => {
-                if (i !== j) { // Don't calculate repulsion with itself
-                    const otherAtom = atoms[j]
-                    const distanceX = atoms[i].x - otherAtom.x
-                    const distanceY = atoms[i].y - otherAtom.y
-                    const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
-        
-                    // Apply repulsion force inversely proportional to distance
-                    const buffer = bias
-                    if (distance < radius * 2 + buffer) { // Only apply repulsion if within overlap range
-                        const force = Math.max(buffer, (radius * 2 - distance) / 5)
-                        repulsionX += force * distanceX / distance
-                        repulsionY += force * distanceY / distance
-                    }
-                }
-                // Update atom's position with repulsion
-                atoms[i].x += repulsionX
-                atoms[i].y += repulsionY
+    const damping = 0.01 // Adjust as needed for smoothness
+    const tolerance = 1
 
-                // Keep atom within canvas boundaries
-                atoms[i].x = Math.max(radius, Math.min(atoms[i].x, canvas.width - radius))
-                atoms[i].y = Math.max(radius, Math.min(atoms[i].y, canvas.height - radius))
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
 
-                // Draw the atom with its adjusted position
-                drawAtom(atoms[i].x, atoms[i].y, atoms[i].text)
+    Object.entries(heads).forEach(([i, value]) => {
+        let repulsionX = 0
+        let repulsionY = 0
+
+        Object.entries(heads).forEach(([j, value]) => {
+            if (i !== j) {
+                const otherAtom = heads[j]
+                const distanceX = heads[i].x - otherAtom.x
+                const distanceY = heads[i].y - otherAtom.y
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY)
+
+                const buffer = bias
+                if (distance < radius * 2 + buffer) {
+                    const force = Math.max(buffer, (radius * 2 - distance) / 5)
+                    const repulsionForce = force * damping; // Apply damping to repulsion force
+                    repulsionX += repulsionForce * distanceX / distance
+                    repulsionY += repulsionForce * distanceY / distance
                 }
-            )
-        }
-        catch {
-            // pass
+            }
+        })
+
+        const moveResult = moveAtomLinear(heads[i].x, heads[i].y, heads[i].targetX, heads[i].targetY, damping)
+        heads[i].x = moveResult.x + repulsionX
+        heads[i].y = moveResult.y + repulsionY
+
+        heads[i].x = Math.max(radius, Math.min(heads[i].x, canvas.width - radius))
+        heads[i].y = Math.max(radius, Math.min(heads[i].y, canvas.height - radius))
+
+        drawAtom(heads[i].x, heads[i].y, heads[i].text)
+
+        if (Math.abs(heads[i].x - heads[i].targetX) <= tolerance &&
+            Math.abs(heads[i].y - heads[i].targetY) <= tolerance) {
+            heads[i].targetX = Math.random() * (canvas.width - radius * 2) + radius
+            heads[i].targetY = Math.random() * (canvas.height - radius * 2) + radius
         }
     })
 }
@@ -102,24 +99,48 @@ function drawAtoms() {
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
 
 function animateAtoms() {
-    requestAnimationFrame(animateAtoms) // Schedule the next animation frame
-  
-    drawAtoms() // Calculate repulsion and redraw atoms on every frame
+    requestAnimationFrame(animateAtoms)
+    drawAtoms()
 }
 
 async function cycleAtoms() {
-    // Randomly generate atoms and store them in the array
-    for (let i = 0; i < 9; i++) {
-        const x = Math.random() * (canvas.width - radius * 2) + radius
-        const y = Math.random() * (canvas.height - radius * 2) + radius
-        atoms[i] = { x, y, text: 'atom-' + i }
+    const atoms = {}
+
+    // If heads is empty, initialize it with default values
+    if (Object.keys(heads).length === 0) {
+        for (let i = 0; i < 9; i++) {
+            const startX = Math.random() * (canvas.width - radius * 2) + radius;
+            const startY = Math.random() * (canvas.height - radius * 2) + radius;
+            atoms[i] = {
+                x: startX,
+                y: startY,
+                text: 'atom-' + i,
+                targetX: startX,
+                targetY: startY,
+            };
+        }
+    } else {
+        Object.entries(heads).forEach(([i, value]) => {
+            // Generate new target positions nearby the current positions
+            const targetX = heads[i].x + Math.random() * 100 - 50 // Adjust the range as needed
+            const targetY = heads[i].y + Math.random() * 100 - 50 // Adjust the range as needed
+
+            atoms[i] = {
+                x: heads[i].x,
+                y: heads[i].y,
+                text: 'atom-' + i,
+                targetX,
+                targetY,
+            }
+        })
     }
+
+    tails = { ...heads }
+    heads = atoms
+
     await delay(6000)
     await cycleAtoms()
 }
 
-// start the animation loop
 animateAtoms()
-
-// update data
 cycleAtoms()
