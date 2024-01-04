@@ -14,29 +14,29 @@ concurrency:
   group: "pages"
   cancel-in-progress: false
 
-# jobs:
-deploy:
-  environment:
-    name: github-pages
-    url: ${{ steps.deployment.outputs.page_url }}
-  runs-on: ubuntu-latest
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Copy to github-pages artifact
-      run: cp -r ./earn-e/* ./github-pages/
+      - name: Copy to github-pages artifact
+        run: cp -r ./earn-e/* ./github-pages/
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: github-pages
-        path: ./github-pages/
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: github-pages
+          path: ./github-pages/
 
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
-      with:
-        name: github-pages
-        path: ./github-pages/
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          name: github-pages
+          path: ./github-pages/
 
