@@ -28,6 +28,8 @@ COPY earn-e package*.json ./
 
 RUN npm install
 
+# RUN npm audit fix --force
+
 LABEL self='<NAME>'
 
 ENTRYPOINT [ "sh", "/src/entrypoint.sh" ]
