@@ -24,6 +24,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Create github-pages directory
+        run: mkdir -p ./github-pages/
+
       - name: Copy to github-pages artifact
         run: cp -r ./earn-e/* ./github-pages/
 
@@ -39,4 +42,5 @@ jobs:
         with:
           name: github-pages
           path: ./github-pages/
+
 
