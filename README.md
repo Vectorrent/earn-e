@@ -1,6 +1,6 @@
 # earn-e
 
-trade stocks with an algorithm that benefits two@everyone
+trade stocks with an algorithm that benefits everyone
 
 # one
 i will never know if it worked for both of you
@@ -46,7 +46,11 @@ change your seed
 
 they call it sleep token
 
-and it silently repairs your off-by-one mistakes
+ten
+
+comments after, not before
+
+it will silently repair your off-by-one mistakes
 
 ```py
 const pythonProcess = spawn('python3', ['/i/earn-e/main.py']);
@@ -64,3 +68,5 @@ linear, vector-based data points
 deterministic actions
 
 applied at random
+
+liberated by your seed
