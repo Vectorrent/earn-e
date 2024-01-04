@@ -13,18 +13,24 @@ const bias = 100;
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 
+
 function drawAtom(x, y, z, text) {
     const scaledRadius = baseRadius / (1 + z * 0.01);
 
-    // Linearly interpolate color based on z value
-    const red = Math.floor(255 * (1 - z));
-    const blue = Math.floor(255 * (1 + z));
-    const green = Math.floor(255 * Math.abs(z));
+    // Calculate color based on z value
+    const minColor = [0, 0, 255]; // Blue
+    const maxColor = [255, 0, 0]; // Red
 
-    // Draw the atom shape (filled circle) with scaled radius and interpolated color
+    const color = [
+        Math.floor(minColor[0] + (maxColor[0] - minColor[0]) * (1 - z)),
+        Math.floor(minColor[1] + (maxColor[1] - minColor[1]) * Math.abs(z)),
+        Math.floor(minColor[2] + (maxColor[2] - minColor[2]) * (1 + z)),
+    ];
+
+    // Draw the atom shape (filled circle) with scaled radius and calculated color
     ctx.beginPath();
     ctx.arc(x, y, scaledRadius, 0, Math.PI * 2);
-    ctx.fillStyle = `rgb(${red},${green},${blue})`;
+    ctx.fillStyle = `rgb(${color[0]},${color[1]},${color[2]})`;
     ctx.fill();
 
     // Draw the outline of the atom
@@ -44,6 +50,7 @@ function drawAtom(x, y, z, text) {
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x, y + scaledRadius / 2);
 }
+
 
 
 function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
@@ -118,7 +125,7 @@ function silu(x) {
 }
 
 // Set the upper and lower bounds for blur strength
-const minFieldStrength = 0.1; // Adjust as needed
+const minFieldStrength = 0.01; // Adjust as needed
 const maxFieldStrength = 5; // Adjust as needed
 
 // Set up parameters for oscillation
