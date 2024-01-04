@@ -30,6 +30,9 @@ jobs:
       - name: Copy to github-pages artifact
         run: cp -r ./earn-e/* ./github-pages/
 
+      - name: List pages artifact
+        run: ls -l ./github-pages/*
+
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
