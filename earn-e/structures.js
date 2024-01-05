@@ -1,26 +1,34 @@
+// Base radius of atoms
+const baseRadius = 44;
+const scalingFactor = 0.01
+const bias = 100;
+
+// Set the upper and lower bounds for blur strength
+const minFieldStrength = 0.01;
+const maxFieldStrength = 5;
+
+// Set up parameters for oscillation
+const oscillationSpeed = 0.01;
+const clarityBias = 0.8;
+
+// Control forces
+const damping = 0.01;
+const tolerance = 1;
+const repulsionStrength = 0.1;
+
+// Monte Carlo simulation
+let heads = {};
+let tails = {};
+
 const canvas = document.getElementById('void');
 const ctx = canvas.getContext('2d');
 canvas.classList.add('overlay');
 
-const windowWidth = window.innerWidth;
-const windowHeight = window.innerHeight;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-canvas.width = windowWidth;
-canvas.height = windowHeight;
-
-const baseRadius = 44; // Base radius of atoms
-const scalingFactor = 0.01
-const bias = 100;
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
-
-// Set the upper and lower bounds for blur strength
-const minFieldStrength = 0.01; // Adjust as needed
-const maxFieldStrength = 5; // Adjust as needed
-
-// Set up parameters for oscillation
-const oscillationSpeed = 0.01; // Adjust as needed
-const clarityBias = 0.8; // Adjust to bias towards clarity
 
 function drawAtom(x, y, z, text) {
     const scaledRadius = baseRadius / (1 + z * scalingFactor);
@@ -55,21 +63,6 @@ function drawAtom(x, y, z, text) {
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x, y + scaledRadius / 2);
 }
-
-function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
-    const dx = (new_x - old_x) * damping;
-    const dy = (new_y - old_y) * damping;
-
-    const updated_x = old_x + dx;
-    const updated_y = old_y + dy;
-
-    return { x: updated_x, y: updated_y };
-}
-
-let heads = {};
-let tails = {};
-const damping = 0.01;
-const tolerance = 1;
 
 function drawAtoms() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -125,9 +118,6 @@ function drawAtoms() {
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-let synapseLines = [];
-let frameCount = 0;
-
 function drawSynapseLine(x1, y1, x2, y2) {
     ctx.beginPath();
     ctx.moveTo(x1, y1);
@@ -137,7 +127,15 @@ function drawSynapseLine(x1, y1, x2, y2) {
     ctx.stroke();
 }
 
-// ... (existing code up to the animateAtoms function) ...
+function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
+    const dx = (new_x - old_x) * damping;
+    const dy = (new_y - old_y) * damping;
+
+    const updated_x = old_x + dx;
+    const updated_y = old_y + dy;
+
+    return { x: updated_x, y: updated_y };
+}
 
 function getRandomInt(min, max) {
     // Ensure min is smaller than max
@@ -145,10 +143,11 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-  
 
 // Store a list of currently active synapse lines
 let activeSynapseLines = [];
+let synapseLines = [];
+let frameCount = 0;
 
 function animateAtoms() {
     requestAnimationFrame(animateAtoms);
@@ -192,9 +191,6 @@ function animateAtoms() {
     }
 }
 
-// ... (rest of the code remains the same) ...
-
-
 // Function to calculate the SILU (Sigmoid-weighted Linear Unit) function
 function silu(x) {
   return x * (1 / (1 + Math.exp(-x)));
@@ -217,7 +213,6 @@ function animateFieldStrength() {
 
 // Start the animation loop
 animateFieldStrength();
-
 
 async function cycleAtoms() {
     const atoms = {};
@@ -256,8 +251,6 @@ async function cycleAtoms() {
 
     tails = { ...heads };
     heads = atoms;
-
-    repulsionStrength = 0.1;
 
     Object.entries(heads).forEach(([i, value]) => {
         let repulsionX = 0;

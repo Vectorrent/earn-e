@@ -70,8 +70,8 @@ const requestListener = async function (req, res) {
         res.writeHead(400)
     } else if (req.url.endsWith('/favicon.ico')) {
         res.writeHead(400)
-    } else if (req.url.endsWith('/tokenizer.js')) {
-        const filePath = '/earn-e/tokenizer.js'
+    } else if (req.url.endsWith('/structures.js')) {
+        const filePath = '/earn-e/structures.js'
         fs.access(filePath, fs.constants.F_OK, (err) => {
             if (err) {
                     res.statusCode = 404
