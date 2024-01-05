@@ -8,7 +8,7 @@ const minFieldStrength = 0.01;
 const maxFieldStrength = 5;
 
 // Set up parameters for oscillation
-const oscillationSpeed = 0.01;
+const oscillationSpeed = 0.001;
 const clarityBias = 0.8;
 
 // Control forces
@@ -67,64 +67,153 @@ function drawAtom(x, y, z, text) {
 function drawAtoms() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw synapse lines first (behind atoms)
-    synapseLines.forEach(line => {
-        drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
-    });
+    // Draw connections and atoms in a recurring pattern
+    for (let i = 0; i < Object.keys(heads).length; i++) {
+        const atom = heads[i];
+        const colorCycle = Math.sin(atom.z * 0.1);
+        const blueChannel = Math.floor(255 * (0.5 - 0.5 * colorCycle));
 
-    Object.entries(heads).forEach(([i, value]) => {
-        let repulsionX = 0;
-        let repulsionY = 0;
+        // Draw connecting lines
+        synapseLines.forEach(line => {
+            const atom1Blue = isAtomBlue(line.atom1.z);
+            const atom2Blue = isAtomBlue(line.atom2.z);
 
-        Object.entries(heads).forEach(([j, value]) => {
-            if (i !== j) {
-                const otherAtom = heads[j];
-                const distanceX = heads[i].x - otherAtom.x;
-                const distanceY = heads[i].y - otherAtom.y;
-                const distanceZ = heads[i].z - otherAtom.z;
-                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ);
-
-                const buffer = bias;
-                if (distance < baseRadius * 2 + buffer) {
-                    const force = Math.max(buffer, (baseRadius * 2 - distance) / 5);
-                    const repulsionForce = force * damping;
-                    repulsionX += repulsionForce * distanceX / distance;
-                    repulsionY += repulsionForce * distanceY / distance;
-                }
+            if (atom1Blue && atom2Blue) {
+                drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
+            } else if (atom1Blue) {
+                drawSynapseLine(
+                    line.atom1.x, line.atom1.y,
+                    line.atom2.x + (line.atom2.x - line.atom1.x) * baseRadius / (baseRadius * 2),
+                    line.atom2.y + (line.atom2.y - line.atom1.y) * baseRadius / (baseRadius * 2)
+                );
+            } else if (atom2Blue) {
+                drawSynapseLine(
+                    line.atom1.x + (line.atom1.x - line.atom2.x) * baseRadius / (baseRadius * 2),
+                    line.atom1.y + (line.atom1.y - line.atom2.y) * baseRadius / (baseRadius * 2),
+                    line.atom2.x, line.atom2.y
+                );
+            } else {
+                drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
             }
         });
 
-        const moveResult = moveAtomLinear(heads[i].x, heads[i].y, heads[i].targetX, heads[i].targetY, damping);
-        heads[i].x = moveResult.x + repulsionX;
-        heads[i].y = moveResult.y + repulsionY;
-
-        heads[i].x = Math.max(baseRadius, Math.min(heads[i].x, canvas.width - baseRadius));
-        heads[i].y = Math.max(baseRadius, Math.min(heads[i].y, canvas.height - baseRadius));
-
-        drawAtom(heads[i].x, heads[i].y, heads[i].z, heads[i].text);
-
-        if (Math.abs(heads[i].x - heads[i].targetX) <= tolerance &&
-            Math.abs(heads[i].y - heads[i].targetY) <= tolerance) {
-            heads[i].targetX = Math.random() * (canvas.width - baseRadius * 2) + baseRadius;
-            heads[i].targetY = Math.random() * (canvas.height - baseRadius * 2) + baseRadius;
+        // Draw the atom
+        if (blueChannel === 0) {
+            drawAtom(atom.x, atom.y, atom.z, atom.text);
         }
-    });
+    }
 
-    // Draw synapse lines after drawing atoms
-    synapseLines.forEach(line => {
-        drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
-    });
+    // Draw blue atoms after lines
+    for (let i = 0; i < Object.keys(heads).length; i++) {
+        const atom = heads[i];
+        const colorCycle = Math.sin(atom.z * 0.1);
+        const blueChannel = Math.floor(255 * (0.5 - 0.5 * colorCycle));
+
+        // Draw connecting lines
+        synapseLines.forEach(line => {
+            const atom1Blue = isAtomBlue(line.atom1.z);
+            const atom2Blue = isAtomBlue(line.atom2.z);
+
+            if (atom1Blue && atom2Blue) {
+                drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
+            } else if (atom1Blue) {
+                drawSynapseLine(
+                    line.atom1.x, line.atom1.y,
+                    line.atom2.x + (line.atom2.x - line.atom1.x) * baseRadius / (baseRadius * 2),
+                    line.atom2.y + (line.atom2.y - line.atom1.y) * baseRadius / (baseRadius * 2)
+                );
+            } else if (atom2Blue) {
+                drawSynapseLine(
+                    line.atom1.x + (line.atom1.x - line.atom2.x) * baseRadius / (baseRadius * 2),
+                    line.atom1.y + (line.atom1.y - line.atom2.y) * baseRadius / (baseRadius * 2),
+                    line.atom2.x, line.atom2.y
+                );
+            } else {
+                drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
+            }
+        });
+
+        // Draw the atom
+        if (blueChannel !== 0) {
+            drawAtom(atom.x, atom.y, atom.z, atom.text);
+        }
+    }
 }
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
 function drawSynapseLine(x1, y1, x2, y2) {
+    const atom1Depth = getAtomDepth(x1, y1);
+    const atom2Depth = getAtomDepth(x2, y2);
+
+    // Calculate the direction from atom1 to atom2
+    const directionX = x2 - x1;
+    const directionY = y2 - y1;
+
+    // Calculate the distance between atoms
+    const distance = Math.sqrt(directionX ** 2 + directionY ** 2);
+
+    // Normalize the direction vector
+    const normalizedDirectionX = directionX / distance;
+    const normalizedDirectionY = directionY / distance;
+
+    // Calculate the position for the left atom's edge
+    const leftEdgeX = x1 + (baseRadius * normalizedDirectionX);
+    const leftEdgeY = y1 + (baseRadius * normalizedDirectionY);
+
+    // Calculate the position for the right atom's center
+    const rightCenterX = x2 - (0.5 * baseRadius * normalizedDirectionX);
+    const rightCenterY = y2 - (0.5 * baseRadius * normalizedDirectionY);
+
     ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
+
+    // Draw the line starting from the left atom's edge to the right atom's center
+    if (atom1Depth <= atom2Depth) {
+        ctx.moveTo(leftEdgeX, leftEdgeY);
+        ctx.lineTo(rightCenterX, rightCenterY);
+    } else {
+        ctx.moveTo(rightCenterX, rightCenterY);
+        ctx.lineTo(leftEdgeX, leftEdgeY);
+    }
+
     ctx.strokeStyle = 'black';
     ctx.lineWidth = 1;
     ctx.stroke();
+}
+
+function getAtomDepth(x, y) {
+    // This function returns the depth (z-axis value) of the atom at the specified coordinates
+    // You can implement the logic to retrieve the depth from the heads object or any other data structure
+
+    // For now, assuming heads object contains atom details
+    const atom = getNearestAtom(x, y);
+    return atom ? atom.z : 0; // Return 0 if atom not found (adjust as needed)
+}
+
+function getNearestAtom(x, y) {
+    // This function returns the nearest atom to the specified coordinates
+    // You can implement the logic to find the nearest atom from the heads object or any other data structure
+
+    // For now, assuming heads object contains atom details
+    let nearestAtom = null;
+    let minDistance = Infinity;
+
+    Object.entries(heads).forEach(([i, value]) => {
+        const atom = heads[i];
+        const distance = Math.sqrt((x - atom.x) ** 2 + (y - atom.y) ** 2);
+        if (distance < minDistance) {
+            minDistance = distance;
+            nearestAtom = atom;
+        }
+    });
+
+    return nearestAtom;
+}
+
+function isAtomBlue(z) {
+    // Your logic to determine if the atom based on its z value is blue
+    // You can use the color calculation from drawAtoms function as a basis
+    const colorCycle = Math.sin(z * 0.1);
+    const blueChannel = Math.floor(255 * (0.5 - 0.5 * colorCycle));
+    return blueChannel > 0; // Adjust threshold if needed
 }
 
 function moveAtomLinear(old_x, old_y, new_x, new_y, damping) {
@@ -143,6 +232,13 @@ function getRandomInt(min, max) {
     max = Math.floor(max);
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+// Function to generate a random number within a range
+function getRandomInRange(min, max) {
+    return Math.random() * (max - min) + min;
+}
+
+const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 // Store a list of currently active synapse lines
 let activeSynapseLines = [];
@@ -258,18 +354,14 @@ async function cycleAtoms() {
 
         Object.entries(heads).forEach(([j, value]) => {
             if (i !== j) {
-                const otherAtom = heads[j];
-                const distanceX = heads[i].x - otherAtom.x;
-                const distanceY = heads[i].y - otherAtom.y;
-                const distanceZ = heads[i].z - otherAtom.z;
-                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ);
+                const atom1 = heads[i];
+                const atom2 = heads[j];
+                const depth1 = atom1.z;
+                const depth2 = atom2.z;
 
-                const buffer = bias;
-                if (distance < baseRadius * 2 + buffer) {
-                    const force = Math.max(buffer, (baseRadius * 2 - distance) / 5);
-                    const repulsionForce = force * repulsionStrength;
-                    repulsionX += repulsionForce * distanceX / distance;
-                    repulsionY += repulsionForce * distanceY / distance;
+                // Draw connection if one atom is in front of the other
+                if ((depth1 > depth2 && isAtomBlue(atom1.z)) || (depth1 < depth2 && !isAtomBlue(atom1.z))) {
+                    drawSynapseLine(atom1.x, atom1.y, atom2.x, atom2.y);
                 }
             }
         });
@@ -296,8 +388,3 @@ async function cycleAtoms() {
 
 animateAtoms();
 cycleAtoms();
-
-// Function to generate a random number within a range
-function getRandomInRange(min, max) {
-    return Math.random() * (max - min) + min;
-}
