@@ -22,17 +22,10 @@ const backendProcess = spawn('python3', ['/earn-e/main.py'])
 backendProcess.stdout.pipe(process.stdout)
 backendProcess.stderr.pipe(process.stderr)
 
-// start a chain for the token
+// start a chain
 const dhtProcess = spawn('sh', ['/earn-e/dht.sh'])
 dhtProcess.stdout.pipe(process.stdout)
 dhtProcess.stderr.pipe(process.stderr)
-
-function getRandomFloat(min, max) {
-    const func = 'Math.random() * (max - min) + min'
-    let bullet = eval(func)
-    console.warn(`WARNING:distance: ${bullet}`)
-    return bullet
-}
 
 async function buildResponse(url) {
     console.log(url)
@@ -117,6 +110,13 @@ http.createServer(requestListener)
 
 // delay for x seconds
 const delay = (ms) => new Promise((res) => setTimeout(res, ms))
+
+function getRandomFloat(min, max) {
+    const func = 'Math.random() * (max - min) + min'
+    let bullet = eval(func)
+    console.warn(`WARNING:distance: ${bullet}`)
+    return bullet
+}
 
 async function polling() {
     try {

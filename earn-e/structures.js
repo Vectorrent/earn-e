@@ -3,11 +3,9 @@ const baseRadius = 44;
 const scalingFactor = 0.01
 const bias = 100;
 
-// Set the upper and lower bounds for blur strength
+// Set up parameters for oscillation, vibration, and blur
 const minFieldStrength = 0.01;
 const maxFieldStrength = 5;
-
-// Set up parameters for oscillation
 const oscillationSpeed = 0.001;
 const clarityBias = 0.8;
 
@@ -15,6 +13,17 @@ const clarityBias = 0.8;
 const damping = 0.01;
 const tolerance = 1;
 const repulsionStrength = 0.1;
+
+ // Adjust the angle for text projection
+const rotation = -2
+const angle = 0
+
+// Check if inversion is needed and set the filter accordingly
+const colors = {
+    white: { filter: "none", bodyBackground: "white" },
+    black: { filter: "invert(100%)", bodyBackground: "black" },
+};
+let colorScheme = 'white'
 
 // Monte Carlo simulation
 let heads = {};
@@ -56,16 +65,38 @@ function drawAtom(x, y, z, text) {
     ctx.strokeStyle = 'black';
     ctx.stroke();
 
-    // Draw the text inside the atom
+    // Project curved text on the atom's surface
+    const textRadius = scaledRadius + rotation;
+    const textAngle = -Math.PI / angle;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(textAngle);
+
     ctx.font = '14px sans-serif';
     ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
+    ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText(text, x, y + scaledRadius / 2);
+
+    // Create a halo effect around the atoms
+    ctx.beginPath();
+    ctx.arc(0, 0, textRadius, 0, Math.PI, true);
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'black';
+    ctx.stroke();
+
+    ctx.fillText(text, -textRadius, 0);
+    ctx.restore();
 }
 
+let splitAngle = Math.random() * Math.PI * 2; // Random angle in radians
+
 function drawAtoms() {
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    canvas.style.filter = colors[colorScheme].filter;
+    document.body.style.backgroundColor = colors[colorScheme].bodyBackground;
 
     // Draw connections and atoms in a recurring pattern
     for (let i = 0; i < Object.keys(heads).length; i++) {
@@ -385,6 +416,27 @@ async function cycleAtoms() {
     await delay(6000);
     await cycleAtoms();
 }
+
+// Function to cycle through color schemes
+function cycleColorScheme() {
+    const schemeNames = Object.keys(colors); // Get names of available schemes
+    const currentIndex = schemeNames.indexOf(colorScheme);
+    colorScheme = schemeNames[(currentIndex + 1) % schemeNames.length]; // Move to the next scheme
+    drawAtoms();
+}
+
+// Add a click listener to the center of the screen
+const clickRadius = Math.min(window.innerWidth, window.innerHeight) * 0.23; // 10% of viewport size
+
+document.addEventListener("click", (event) => {
+    const distanceFromCenter = Math.sqrt(
+        Math.pow(event.pageX - centerX, 2) + Math.pow(event.pageY - centerY, 2)
+    );
+
+    if (distanceFromCenter <= clickRadius) {
+        cycleColorScheme();
+    }
+});
 
 animateAtoms();
 cycleAtoms();
