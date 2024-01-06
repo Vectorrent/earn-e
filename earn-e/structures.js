@@ -108,13 +108,19 @@ function drawAtoms() {
 
     // Draw synapse lines after drawing atoms
     synapseLines.forEach(line => {
-        drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
+        drawSynapseLine(line.atom1, line.atom2);
     });
 }
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
-function drawSynapseLine(x1, y1, x2, y2) {
+function drawSynapseLine(atom1, atom2) {
+    // Extract coordinates directly from atom objects
+    const x1 = atom1.x;
+    const y1 = atom1.y;
+    const x2 = atom2.x;
+    const y2 = atom2.y;
+    
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
@@ -151,8 +157,19 @@ function animateAtoms() {
 
     // Draw active synapse lines
     activeSynapseLines.forEach(({ atom1, atom2 }) => {
-        drawSynapseLine(atom1.x, atom1.y, atom2.x, atom2.y);
-    });
+        // Determine which atom should be drawn "closer"
+        const closerAtom = atom1.z > atom2.z ? atom1 : atom2;
+        const fartherAtom = atom1 === closerAtom ? atom2 : atom1;
+      
+        // Draw the farther atom first
+        drawAtom(fartherAtom.x, fartherAtom.y, fartherAtom.z, fartherAtom.text);
+      
+        // Draw the connecting line
+        drawSynapseLine(atom1, atom2);
+      
+        // Draw the closer atom to appear in front of the line
+        drawAtom(closerAtom.x, closerAtom.y, closerAtom.z, closerAtom.text);
+      });  
 
     frameCount++;
 
@@ -182,7 +199,7 @@ function animateAtoms() {
             const atom2 = heads[atom2Index];
 
             activeSynapseLines.push({ atom1, atom2 });
-            drawSynapseLine(atom1.x, atom1.y, atom2.x, atom2.y);
+            drawSynapseLine(atom1, atom2); // Pass atom objects
         });
     }
 }

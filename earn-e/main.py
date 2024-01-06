@@ -28,7 +28,7 @@ while True:
     rest = random.uniform(0.6, 0.666)
     sleep_time = rest * base
     time.sleep(sleep_time)
-    if rest > 0.66:
+    if rest > 0.06:
         logging.warning(f"bert took 1 step")
         responses = asyncio.run(bert.speak())
         for response in responses:
