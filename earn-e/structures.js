@@ -61,11 +61,12 @@ function drawAtom(x, y, z, text) {
 }
 
 function drawAtoms() {
+    // Clear the canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw synapse lines first (behind atoms)
-    synapseLines.forEach(line => {
-        drawSynapseLine(line.atom1.x, line.atom1.y, line.atom2.x, line.atom2.y);
+    activeSynapseLines.forEach(({ atom1, atom2 }) => {
+        drawSynapseLine(atom1, atom2);
     });
 
     Object.entries(heads).forEach(([i, value]) => {
@@ -104,11 +105,6 @@ function drawAtoms() {
             heads[i].targetX = Math.random() * (canvas.width - baseRadius * 2) + baseRadius;
             heads[i].targetY = Math.random() * (canvas.height - baseRadius * 2) + baseRadius;
         }
-    });
-
-    // Draw synapse lines after drawing atoms
-    synapseLines.forEach(line => {
-        drawSynapseLine(line.atom1, line.atom2);
     });
 }
 
