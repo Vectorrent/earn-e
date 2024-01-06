@@ -5,13 +5,14 @@ services:
     image: ghcr.io/0-5788719150923125/dht:latest
     tty: true
     stdin_open: true
+    network_mode: host
     build: .
     volumes:
       - ./earn-e:/earn-e
       - ./data:/data
       - models:/models
-    ports:
-      - 60000:60000/tcp
+    # ports:
+    #   - 60000:60000/tcp
     env_file:
       - .env
 
