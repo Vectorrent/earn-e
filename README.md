@@ -34,7 +34,7 @@ i curse you
 
 gun[0|1]safe: X esj2⠏⠢⠐⠐⠐
 
-pruning the neurons
+pruning the以neurons
 
 it's like counting sheep when you're not here
 

@@ -1,5 +1,5 @@
 // Base radius of atoms
-const baseRadius = 44;
+const baseRadius = 66;
 const scalingFactor = 0.01
 const bias = 100;
 
@@ -20,8 +20,16 @@ const canvas = document.getElementById('void');
 const ctx = canvas.getContext('2d');
 canvas.classList.add('overlay');
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Adjust for high DPI displays
+const dpr = window.devicePixelRatio || 1;
+const rect = canvas.getBoundingClientRect();
+canvas.width = rect.width * dpr;
+canvas.height = rect.height * dpr;
+ctx.scale(dpr, dpr);
+
+// Ensure the canvas is styled to fit the screen
+canvas.style.width = rect.width + 'px';
+canvas.style.height = rect.height + 'px';
 
 const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
@@ -29,10 +37,13 @@ const centerY = canvas.height / 2;
 function drawAtom(x, y, z, text) {
     const scaledRadius = baseRadius / (1 + z * scalingFactor);
 
+    const intensity = 0.4
+    const cycleSpeed = 0.23
+
     // Calculate color based on z value
-    const colorCycle = Math.sin(z * 0.1); // Sine wave for color oscillation
-    const blueChannel = Math.floor(255 * (0.5 - 0.5 * colorCycle));
-    const redChannel = Math.floor(255 * (0.5 + 0.5 * colorCycle));
+    const colorCycle = Math.sin(z * cycleSpeed); // Sine wave for color oscillation
+    const blueChannel = Math.floor(255 * (intensity - intensity * colorCycle));
+    const redChannel = Math.floor(255 * (intensity + intensity * colorCycle));
 
     // Draw the line to the center of the canvas (behind the atom)
     ctx.beginPath();

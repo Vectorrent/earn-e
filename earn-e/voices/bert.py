@@ -23,12 +23,12 @@ async def speak():
     context = answer
 
     # Or for text classification:
-    text = "I remembered to ask about the AI."
+    text = f"{context} {question}{answer['answer']}. I am certain that I remembered to talk about the AI."
     classifier = transformers.pipeline("text-classification", model="bert-base-uncased")
     label = classifier(text)
     # Output: {'label': 'POSITIVE', 'score': 0.999854}
 
-    responses = [context, question, answer['answer'], text, label]
+    responses = [context, question, answer['answer'], text, label[0]['score']]
     return responses
 
 if __name__ == "__main__":
